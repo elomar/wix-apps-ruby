@@ -43,7 +43,9 @@ module Wix
       end
 
       def secured_path?
-        options[:secured_paths].include? @env['PATH_INFO']
+        options[:secured_paths].any? do |secured_path|
+          @env['PATH_INFO'].match secured_path
+        end
       end
 
       def have_instance?

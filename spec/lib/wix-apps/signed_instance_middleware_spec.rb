@@ -6,7 +6,7 @@ describe Wix::Apps::SignedInstanceMiddleware do
   let(:app) { lambda { |env| [200, {}, []] } }
   let(:secret) { 'd245bbf8-57eb-49d6-aeff-beff6d82cd39' }
 
-  let(:middleware) { Wix::Apps::SignedInstanceMiddleware.new(app, secured_paths: ['/wix'],
+  let(:middleware) { Wix::Apps::SignedInstanceMiddleware.new(app, secured_paths: ['/wix', /\/wix\/.*/],
                       secret_key: secret) }
   let(:mock_request) { Rack::MockRequest.new(middleware) }
 
@@ -19,8 +19,13 @@ describe Wix::Apps::SignedInstanceMiddleware do
   end
 
   describe "Secured Paths" do
-    describe "without instanse" do
+    describe "without instance" do
       let(:response) { mock_request.get('/wix') }
+      it("returns a 401") { response.status.should == 401 }
+    end
+
+    describe "with regex" do
+      let(:response) { mock_request.get('/wix/id') }
       it("returns a 401") { response.status.should == 401 }
     end
 
